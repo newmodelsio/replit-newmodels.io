@@ -23,7 +23,8 @@ import type {
   DiscordMessage,
   DiscordMessageInput,
   DiscordSubmission,
-  HealthStatus
+  HealthStatus,
+  NewModelsContent
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -52,6 +53,83 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getGetNewModelsContentUrl = () => {
+
+
+
+
+  return `/api/new-models/content`
+}
+
+/**
+ * @summary Fetch New Models page and archive content
+ */
+export const getNewModelsContent = async ( options?: Parameters<typeof customFetch>[1]): Promise<NewModelsContent> => {
+
+  return customFetch<NewModelsContent>(getGetNewModelsContentUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetNewModelsContentQueryKey = () => {
+    return [
+    `/api/new-models/content`
+    ] as const;
+    }
+
+
+export const getGetNewModelsContentQueryOptions = <TData = Awaited<ReturnType<typeof getNewModelsContent>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getNewModelsContent>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetNewModelsContentQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getNewModelsContent>>> = ({ signal }) => getNewModelsContent({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getNewModelsContent>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetNewModelsContentQueryResult = NonNullable<Awaited<ReturnType<typeof getNewModelsContent>>>
+export type GetNewModelsContentQueryError = ErrorType<void>
+
+
+/**
+ * @summary Fetch New Models page and archive content
+ */
+
+export function useGetNewModelsContent<TData = Awaited<ReturnType<typeof getNewModelsContent>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getNewModelsContent>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetNewModelsContentQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getGetDiscordMessagesUrl = (channelId: string,) => {
 

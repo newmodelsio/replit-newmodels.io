@@ -12,7 +12,23 @@ tags:
     description: Health operations
   - name: discord
     description: Discord community operations
+  - name: site-content
+    description: New Models site content
 paths:
+  /new-models/content:
+    get:
+      operationId: getNewModelsContent
+      tags: [site-content]
+      summary: Fetch New Models page and archive content
+      responses:
+        "200":
+          description: New Models page and archive content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewModelsContent"
+        "503":
+          description: New Models content is unavailable
   /discord/{channelId}:
     get:
       operationId: getDiscordMessages
@@ -100,4 +116,64 @@ components:
           type: string
       required:
         - status
-
+    NewModelsContent:
+      type: object
+      required: [featured, about, links, footer, columnA, columnB, columnC, search]
+      properties:
+        featured:
+          type: object
+          additionalProperties: true
+        about:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        links:
+          type: string
+        footer:
+          type: string
+        columnA:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        columnB:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        columnC:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        search:
+          type: object
+          required: [nav, archive]
+          properties:
+            nav:
+              type: object
+              additionalProperties: true
+            archive:
+              type: array
+              items:
+                type: object
+                required: [id, title, published, link, type, tags]
+                properties:
+                  id:
+                    type: string
+                  title:
+                    type: string
+                  published:
+                    type: string
+                  link:
+                    type: string
+                  type:
+                    type: string
+                  tags:
+                    type: string
+                  slug:
+                    type: string
+                additionalProperties: true
+          additionalProperties: true
+      additionalProperties: true

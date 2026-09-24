@@ -19,7 +19,7 @@ export default function AltAggregate({ data }) {
           case "Dark":
             return <Dark />
           case "Archive":
-            return <Search />
+            return <Search data={data.search} />
           default:
             return null
         }

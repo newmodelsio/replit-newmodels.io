@@ -9,6 +9,32 @@ import * as zod from 'zod';
 
 
 /**
+ * @summary Fetch New Models page and archive content
+ */
+export const GetNewModelsContentResponse = zod.object({
+  "featured": zod.record(zod.string(), zod.unknown()),
+  "about": zod.array(zod.record(zod.string(), zod.unknown())),
+  "links": zod.string(),
+  "footer": zod.string(),
+  "columnA": zod.array(zod.record(zod.string(), zod.unknown())),
+  "columnB": zod.array(zod.record(zod.string(), zod.unknown())),
+  "columnC": zod.array(zod.record(zod.string(), zod.unknown())),
+  "search": zod.object({
+  "nav": zod.record(zod.string(), zod.unknown()),
+  "archive": zod.array(zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "published": zod.string(),
+  "link": zod.string(),
+  "type": zod.string(),
+  "tags": zod.string(),
+  "slug": zod.string().optional()
+}))
+})
+})
+
+
+/**
  * @summary Fetch messages from a public community channel
  */
 export const GetDiscordMessagesParams = zod.object({

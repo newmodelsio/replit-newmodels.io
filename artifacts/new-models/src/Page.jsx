@@ -1,4 +1,4 @@
-import data from "@/data/content.json";
+import { useGetNewModelsContent } from "@workspace/api-client-react";
 
 import Logo from "./components/Logo"
 import FeaturedPost from "./components/FeaturedPost"
@@ -7,6 +7,28 @@ import Footer from "./components/Footer"
 import Nav from "./components/Nav"
 
 export default function Main() {
+  const { data, isLoading, isError, refetch } = useGetNewModelsContent({
+    query: { retry: false },
+  })
+
+  if (isLoading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center p-6" role="status">
+        Loading New Models…
+      </main>
+    )
+  }
+
+  if (isError || !data) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center gap-3 p-6 text-center">
+        <p role="alert">New Models content could not be loaded. Please try again.</p>
+        <button className="underline" onClick={() => refetch()}>
+          Try again
+        </button>
+      </main>
+    )
+  }
 
   return (
     <>

@@ -1,48 +1,55 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useMemo, useState, useEffect } from "react"
 import Filter from "./Filter"
 
-export default function Search() {
-  const [json, setJson] = useState()
+export default function Search({ data }) {
   const [results, setResults] = useState()
-
   const [input, setInput] = useState("")
 
-  async function loadData() {
-    try {
-      const response = await fetch(`https://assets.newmodels.io/search.json`)
-      if (!response.ok) throw new Error("Failed to fetch")
-      const data = await response.json()
-      setJson(data)
-    } catch (e) {
-      const fallbackResponse = await fetch(`/search.json`)
-      const data = await fallbackResponse.json()
-      setJson(data)
-    }
-  }
+  const archive = data.archive
+  const filterByYear = useMemo(() => {
+    const years = new Set(
+      archive
+        .map((item) => item.published.match(/^\d{4}/)?.[0])
+        .filter(Boolean),
+    )
+    return [...years]
+      .sort((a, b) => b.localeCompare(a))
+      .map((year) => ({ slug: year, text: year }))
+  }, [archive])
+  const filterByCategory = useMemo(() => {
+    const counts = new Map()
+    archive.forEach((item) => {
+      item.tags.split(",").forEach((tag) => {
+        const normalized = tag.trim()
+        if (normalized) counts.set(normalized, (counts.get(normalized) ?? 0) + 1)
+      })
+    })
+    return [...counts]
+      .filter(([, count]) => count >= 10)
+      .sort(([a, countA], [b, countB]) => countB - countA || a.localeCompare(b))
+      .slice(0, 30)
+      .map(([tag]) => ({ slug: tag, text: tag }))
+  }, [archive])
+  const filterByType = useMemo(() => {
+    const types = new Set(archive.map((item) => item.type).filter(Boolean))
+    return [...types].sort().map((type) => ({ slug: type, text: type }))
+  }, [archive])
 
   function handleChange(key, value) {
-    if (json) {
-      const updatedResulted = json.archive.filter((item) => {
-        return (
-          item[key].toLowerCase().includes(value.toLowerCase()) &&
-          item["title"].toLowerCase().includes(input.toLowerCase())
-        )
-      })
-      setResults(updatedResulted)
-    }
+    const updatedResults = archive.filter((item) => {
+      return (
+        item[key].toLowerCase().includes(value.toLowerCase()) &&
+        item.title.toLowerCase().includes(input.toLowerCase())
+      )
+    })
+    setResults(updatedResults)
   }
 
   useEffect(() => {
-    loadData()
-  }, [])
-
-  useEffect(() => {
-    if (json?.archive) {
-      setResults(json.archive)
-    }
-  }, [json])
+    setResults(archive)
+  }, [archive])
 
   useEffect(() => {
     if (input) {
@@ -77,18 +84,16 @@ export default function Search() {
           </div>
         </div>
       </div>
-      {json ? (
+      {data ? (
         <>
-          {/* {results?.length > 0 && ( */}
           <Filter
-            allResults={json.archive}
-            filterByYear={json.year}
-            filterByCategory={json.category}
-            filterByType={json.type}
+            allResults={archive}
+            filterByYear={filterByYear}
+            filterByCategory={filterByCategory}
+            filterByType={filterByType}
             handleChange={handleChange}
             input={input}
           />
-          {/* )} */}
           <br />
           {results?.length > 0 ? (
             <div className="p-5 md:columns-3 gap-5 min-h-screen">

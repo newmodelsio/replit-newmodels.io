@@ -27,3 +27,44 @@ export interface HealthStatus {
   status: string;
 }
 
+export type NewModelsContentFeatured = { [key: string]: unknown };
+
+export type NewModelsContentAboutItem = { [key: string]: unknown };
+
+export type NewModelsContentColumnAItem = { [key: string]: unknown };
+
+export type NewModelsContentColumnBItem = { [key: string]: unknown };
+
+export type NewModelsContentColumnCItem = { [key: string]: unknown };
+
+export type NewModelsContentSearchNav = { [key: string]: unknown };
+
+export type NewModelsContentSearchArchiveItem = {
+  id: string;
+  title: string;
+  published: string;
+  link: string;
+  type: string;
+  tags: string;
+  slug?: string;
+  [key: string]: unknown;
+ };
+
+export type NewModelsContentSearch = {
+  nav: NewModelsContentSearchNav;
+  archive: NewModelsContentSearchArchiveItem[];
+  [key: string]: unknown;
+ };
+
+export interface NewModelsContent {
+  featured: NewModelsContentFeatured;
+  about: NewModelsContentAboutItem[];
+  links: string;
+  footer: string;
+  columnA: NewModelsContentColumnAItem[];
+  columnB: NewModelsContentColumnBItem[];
+  columnC: NewModelsContentColumnCItem[];
+  search: NewModelsContentSearch;
+  [key: string]: unknown;
+ }
+
