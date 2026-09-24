@@ -12,12 +12,30 @@ export default function Logo() {
       "https://api.nasa.gov/neo/rest/v1/feed/today?detailed=true&api_key=DEMO_KEY"
     )
       .then(function (response) {
+        if (!response.ok) {
+          throw new Error(`NASA NEO API returned ${response.status}`)
+        }
         return response.json()
       })
-      .then(function (data) {
-        let key = Object.keys(data.near_earth_objects)[0]
-        let l = data.near_earth_objects[key]
-        a = data.near_earth_objects[key][0].absolute_magnitude_h
+      .then(function (nasaData) {
+        const nearEarthObjects = nasaData?.near_earth_objects
+        const firstObject = nearEarthObjects
+          ? Object.values(nearEarthObjects)
+              .flat()
+              .find((object) => Number.isFinite(object?.absolute_magnitude_h))
+          : null
+
+        if (firstObject) {
+          a = firstObject.absolute_magnitude_h
+          return
+        }
+
+        a = 1
+        console.warn("NASA NEO response did not contain usable object data.")
+      })
+      .catch((error) => {
+        a = 1
+        console.warn("NASA NEO data is unavailable; using a neutral logo input.", error)
       })
 
     fetch(
