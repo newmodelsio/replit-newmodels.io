@@ -10,7 +10,51 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: discord
+    description: Discord community operations
 paths:
+  /discord/{channelId}:
+    get:
+      operationId: getDiscordMessages
+      tags: [discord]
+      summary: Fetch messages from a public community channel
+      parameters:
+        - in: path
+          name: channelId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Discord messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordMessage"
+        "503":
+          description: Discord is not configured
+  /discord:
+    post:
+      operationId: postDiscordMessage
+      tags: [discord]
+      summary: Submit a message to the community webhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscordMessageInput"
+      responses:
+        "200":
+          description: Message submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordSubmission"
+        "503":
+          description: Discord is not configured
   /healthz:
     get:
       operationId: healthCheck
@@ -26,6 +70,29 @@ paths:
                 $ref: "#/components/schemas/HealthStatus"
 components:
   schemas:
+    DiscordMessage:
+      type: object
+      additionalProperties: true
+      required: [id, content]
+      properties:
+        id:
+          type: string
+        content:
+          type: string
+    DiscordMessageInput:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+          minLength: 1
+          maxLength: 2000
+    DiscordSubmission:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
     HealthStatus:
       type: object
       properties:

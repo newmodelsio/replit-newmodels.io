@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "New Models"
+description = "A media channel and community site about networked culture, with featured content, an archive search, and Discord community sections."
+version = "1.0.0"
+id = "artifacts/new-models"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21157
+
+[services.development]
+run = "pnpm --filter @workspace/new-models run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/new-models", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/new-models/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21157"
+BASE_PATH = "/"

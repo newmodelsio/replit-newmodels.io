@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+* {
+  -webkit-appearance: none;
+  -webkit-font-smoothing: antialiased;
+  border-color: #eee;
+}
+
+.columns-2 a:hover {
+  text-decoration: underline;
+}
+
+html,
+body {
+  font-family: Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@font-face {
+  font-family: "Discord";
+  src: url("/980082c4328266be3342a03dcb37c432.woff2");
+  font-display: block;
+}
+
+.font-discord {
+  font-family: "Discord";
+}
+
+iframe {
+  max-width: 100%;
+}
+
+.postContent a {
+  color: #1daaf9;
+}
+
+.prose p {
+  margin-bottom: 15px;
+}
+
+.prose img {
+  width: 100%;
+}
+
+.slideIn {
+  animation: slideIn 300ms;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0%);
+  }
+}
+
+.fadeIn {
+  animation: fadeIn 300ms;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
