@@ -5,6 +5,7 @@ import FeaturedPost from "./components/FeaturedPost"
 import Aggregate from "./components/Aggregate"
 import Footer from "./components/Footer"
 import Nav from "./components/Nav"
+import { Spinner } from "./components/ui/spinner"
 
 export default function Main() {
   const { data, isLoading, isError, refetch } = useGetNewModelsContent({
@@ -13,8 +14,8 @@ export default function Main() {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center p-6" role="status">
-        Loading New Models…
+      <main className="flex min-h-screen items-center justify-center p-6">
+        <Spinner className="size-6" />
       </main>
     )
   }
