@@ -1,6 +1,4 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { Input } from '../components/ui/input';
-import { ScrollArea } from '../components/ui/scroll-area';
 import {
   ALL_ENTRIES,
   DESIGN_SYSTEM,
@@ -95,6 +93,7 @@ function NavigationItems({
 export function DesignSystemBrowser() {
   const [selectedId, select] = useSelectedId();
   const [query, setQuery] = useState('');
+  const [isDark, setIsDark] = useState(false);
   const mobileNav = useRef<HTMLDetailsElement>(null);
   const mobileNavSummary = useRef<HTMLElement>(null);
   const normalizedQuery = query.trim().toLowerCase();
@@ -137,21 +136,35 @@ export function DesignSystemBrowser() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground md:grid md:grid-cols-[260px_minmax(0,1fr)]">
+    <div
+      className={`${isDark ? 'dark' : ''} min-h-screen bg-background text-foreground md:grid md:grid-cols-[260px_minmax(0,1fr)]`}
+    >
       <aside className="border-b bg-muted/20 md:sticky md:top-0 md:flex md:h-screen md:flex-col md:border-b-0 md:border-r">
-        <div className="border-b px-5 py-5">
-          <p className="text-sm font-semibold">{DESIGN_SYSTEM.title}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Browse the system</p>
+        <div className="flex items-start justify-between gap-3 border-b px-5 py-5">
+          <div>
+            <p className="text-sm font-semibold">{DESIGN_SYSTEM.title}</p>
+            <p className="mt-1 text-xs text-muted-foreground">Browse the system</p>
+          </div>
+          <button
+            type="button"
+            aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
+            aria-pressed={isDark}
+            className="shrink-0 border bg-background px-2 py-1 text-xs hover:bg-muted"
+            onClick={() => setIsDark(!isDark)}
+          >
+            {isDark ? 'Light' : 'Dark'}
+          </button>
         </div>
         <div className="p-4 pb-2">
-          <Input
+          <input
+            className="w-full border border-input bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             aria-label="Search design system"
             placeholder="Search design system…"
           />
         </div>
-        <ScrollArea className="hidden min-h-0 flex-1 px-4 pb-4 md:block">
+        <div className="hidden min-h-0 flex-1 overflow-y-auto px-4 pb-4 md:block">
           <NavigationItems
             showOverview={showOverview}
             groups={filteredGroups}
@@ -159,7 +172,7 @@ export function DesignSystemBrowser() {
             query={query}
             select={selectPage}
           />
-        </ScrollArea>
+        </div>
         <details ref={mobileNav} className="border-t px-4 py-3 md:hidden">
           <summary
             ref={mobileNavSummary}
@@ -168,7 +181,7 @@ export function DesignSystemBrowser() {
             Browse sections:{' '}
             <span className="text-muted-foreground">{active.name}</span>
           </summary>
-          <ScrollArea className="mt-3 h-64 pb-2">
+          <div className="mt-3 h-64 overflow-y-auto pb-2">
             <NavigationItems
               showOverview={showOverview}
               groups={filteredGroups}
@@ -176,7 +189,7 @@ export function DesignSystemBrowser() {
               query={query}
               select={selectPage}
             />
-          </ScrollArea>
+          </div>
         </details>
       </aside>
 

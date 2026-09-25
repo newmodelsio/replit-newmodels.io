@@ -1,82 +1,32 @@
-# Consuming New Models Design System in Expo apps
+# Consuming New Models Design System in Expo
 
-Read `artifacts/new-models-design-system/docs/AGENTS.md` first. React Native does
-not consume the web CSS or DOM components. It imports portable tokens, native
-theme/hooks, and native components directly from this package. If the Expo app
-still contains scaffolded or existing local theme/hooks/components, also read
-`artifacts/new-models-design-system/docs/migrating-expo.md` before writing UI.
+Read `artifacts/new-models-design-system/docs/AGENTS.md` first. The current
+design-system package exports tokens and web components; it does not yet contain
+native themes, hooks, or React Native components.
 
-## Native theme and fonts
+## Use the tokens
 
-Build the shared light/dark palette, numeric radius and spacing conversion, and
-registered typography names in `src/lib/native-theme.tsx`. Convert CSS lengths
-once inside this package:
+Expo apps can import generated token values:
 
 ```tsx
-import { tokens } from "@workspace/new-models-design-system/tokens";
+import { tokens } from
+  "@workspace/new-models-design-system/tokens";
 
-const radius = tokens.radius.endsWith("rem")
-  ? Number.parseFloat(tokens.radius) * 16
-  : Number.parseFloat(tokens.radius);
+const archiveBackground = tokens.color.light.background;
+const discordSurface = tokens.color.dark.background;
 ```
 
-Export `useColors` from `src/hooks/use-colors.tsx`. Export a font hook from
-`src/hooks/use-fonts.tsx` that loads every required weight through `useFonts` and
-returns `fontsLoaded` and `fontError`. Use exact registered names such as
-`Inter_400Regular`, not CSS family names.
+Use these values from an app-owned NativeWind, StyleSheet, or other native theme.
+Do not copy token values into a second source of truth.
 
-Expo imports these concrete paths directly:
+## Keep native UI local
 
-```tsx
-import { nativeTheme } from "@workspace/new-models-design-system/lib/native-theme";
-import { useColors } from "@workspace/new-models-design-system/hooks/use-colors";
-import { useDesignSystemFonts } from "@workspace/new-models-design-system/hooks/use-fonts";
-```
-
-Keep the root layout's existing SplashScreen gating around the shared font
-hook's `fontsLoaded` and `fontError` result.
-
-## Native components
-
-Before writing screens, inventory the app's visual building blocks and add the
-product-agnostic families it needs under `src/components/native/`. Typical
-families include Button (including `size="icon"`), typography, Input, Textarea,
-Label and Field, Card, Badge, Toggle or ToggleGroup, Empty, Spinner, and
-Skeleton.
-
-When `src/components/ui/` has a web counterpart, match its family exports, prop
-names, variants, sizes, defaults, and state semantics wherever React Native
-supports them. Implement with native primitives and document platform-required
-differences in the base `AGENTS.md` inventory.
-
-Import native primitives directly:
-
-```tsx
-import { Badge } from "@workspace/new-models-design-system/components/native/badge";
-import { Button } from "@workspace/new-models-design-system/components/native/button";
-import { Card } from "@workspace/new-models-design-system/components/native/card";
-```
-
-Keep product data, navigation, state, and domain compositions in Expo. A
-pet-adoption `DogCard`, for example, stays app-owned but composes package Card,
-Button, Badge, and typography primitives.
-
-## Dependencies and assets
-
-When native package source imports `react-native`, Expo modules, or font
-packages, declare compatible versions in this package's peer and development
-dependencies and in the consuming Expo artifact's dependencies.
-
-Metro resolves the workspace package through pnpm symlinks. Do not copy source
-or token values. Loose binary assets may still need copying into Expo because
-Metro does not watch sibling artifact folders by default.
-
-Set `app.json`'s literal `splash.backgroundColor` from
-`tokens.color.light.background` and keep it synchronized when that token changes.
+Do not import `styles.css` or `components/ui/*` into React Native. The current
+package has no native component or hook exports, so retain or author
+app-specific native themes, hooks, and components in the Expo app.
 
 ## Verify
 
-Import and render
-`@workspace/new-models-design-system/components/native/button`, then run Expo
-typecheck and the development workflow. The import, native theme, and font hook
-must resolve before broader screen work begins.
+After adding the workspace dependency, import the token object and render an
+app-owned native primitive using it. Run the Expo typecheck and development
+preview before applying tokens to additional screens.

@@ -1,133 +1,156 @@
-import { Badge } from '../components/ui/badge';
-import { Button } from '../components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '../components/ui/card';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Switch } from '../components/ui/switch';
+import { useState } from 'react';
+import { tokens } from '../generated/tokens';
+import { ArchiveSearch } from '../components/ui/archive-search';
+import { EditorialBlock } from '../components/ui/editorial-content';
+import { ModeToggle } from '../components/ui/mode-toggle';
+import { NavigationDrawer } from '../components/ui/navigation-drawer';
+import { sampleAbout, sampleArchive, sampleEditorialSection } from './samples';
 
-const CORE_SWATCHES = [
-  { name: 'Primary', className: 'bg-primary' },
-  { name: 'Secondary', className: 'bg-secondary' },
-  { name: 'Accent', className: 'bg-accent' },
-] as const;
+type ColorMode = keyof typeof tokens.color;
+type ColorRole = keyof typeof tokens.color.light;
 
-const SUPPORTING_SWATCHES = [
-  { name: 'Background', className: 'border bg-background' },
-  { name: 'Foreground', className: 'bg-foreground' },
-  { name: 'Muted', className: 'bg-muted' },
-  { name: 'Destructive', className: 'bg-destructive' },
-  { name: 'Border', className: 'bg-border' },
-] as const;
+const COLOR_ROLES: ColorRole[] = [
+  'background',
+  'foreground',
+  'border',
+  'card',
+  'cardForeground',
+  'popover',
+  'popoverForeground',
+  'primary',
+  'primaryForeground',
+  'secondary',
+  'secondaryForeground',
+  'muted',
+  'mutedForeground',
+  'accent',
+  'accentForeground',
+  'destructive',
+  'destructiveForeground',
+  'input',
+  'ring',
+  'chart1',
+  'chart2',
+  'chart3',
+  'chart4',
+  'chart5',
+  'sidebar',
+  'sidebarForeground',
+  'sidebarBorder',
+  'sidebarPrimary',
+  'sidebarPrimaryForeground',
+  'sidebarAccent',
+  'sidebarAccentForeground',
+  'sidebarRing',
+];
 
-const TYPE_SCALE = [
-  { label: 'Display', className: 'text-4xl font-bold' },
-  { label: 'Heading', className: 'text-2xl font-semibold' },
-  { label: 'Body', className: 'text-base' },
-  { label: 'Label', className: 'text-sm font-medium' },
-  { label: 'Caption', className: 'text-sm text-muted-foreground' },
-] as const;
+function prettyName(value: string) {
+  return value
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/^./, (character) => character.toUpperCase());
+}
 
-const SPACING_SCALE = [
-  { label: '4', className: 'w-4' },
-  { label: '8', className: 'w-8' },
-  { label: '12', className: 'w-12' },
-  { label: '16', className: 'w-16' },
-  { label: '24', className: 'w-24' },
-] as const;
-
-function Swatch({
-  name,
-  className,
+function Palette({
+  mode,
+  roles,
 }: {
-  name: string;
-  className: string;
+  mode: ColorMode;
+  roles: ColorRole[];
 }) {
+  const palette = tokens.color[mode];
+
   return (
-    <div className="space-y-2">
-      <div className={`h-16 rounded-lg ${className}`} />
-      <p className="text-sm font-medium">{name}</p>
-    </div>
+    <section
+      className="rounded border p-5"
+      style={{
+        backgroundColor: palette.background,
+        color: palette.foreground,
+        borderColor: palette.border,
+      }}
+    >
+      <div className="mb-4 flex items-baseline justify-between gap-3">
+        <h2 className="text-sm font-bold uppercase">{mode} palette</h2>
+        <code className="text-xs opacity-70">color.{mode}.*</code>
+      </div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        {roles.map((role) => (
+          <div key={role}>
+            <div
+              className="h-12 border"
+              style={{
+                backgroundColor: palette[role],
+                borderColor: palette.border,
+              }}
+            />
+            <p className="mt-2 text-xs font-medium">{prettyName(role)}</p>
+            <code className="text-[11px] opacity-70">{palette[role]}</code>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
 export function OverviewPage() {
+  const [mode, setMode] = useState('Clear');
+
   return (
-    <div className="space-y-4">
-      <section className="rounded-xl border bg-card p-5 text-card-foreground">
-        <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Core palette
-        </h2>
-        <div className="mt-4 grid grid-cols-3 gap-3">
-          {CORE_SWATCHES.map((swatch) => (
-            <Swatch key={swatch.name} {...swatch} />
-          ))}
+    <div className="space-y-6">
+      <section className="rounded border bg-card p-5 text-card-foreground">
+        <p className="text-xs font-bold uppercase text-muted-foreground">
+          Source-derived system
+        </p>
+        <h2 className="mt-2 text-2xl font-bold">New Models</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+          A sparse editorial archive built around Helvetica, black-and-white
+          surfaces, fine rules, and a focused blue link color. The dark palette
+          comes from the separate Discord mode, rather than an alternate theme
+          for the light archive.
+        </p>
+      </section>
+
+      <section className="rounded border bg-card p-5 text-card-foreground">
+        <div className="mb-3">
+          <h2 className="text-sm font-bold uppercase">View selector</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Clear, Dark, and Archive are the source product modes.
+          </p>
+        </div>
+        <ModeToggle toggle={mode} setToggle={setMode} />
+      </section>
+
+      <section className="rounded border bg-card p-5 text-card-foreground">
+        <h2 className="mb-4 text-sm font-bold uppercase">Editorial content</h2>
+        <EditorialBlock block={sampleEditorialSection} />
+      </section>
+
+      <section className="overflow-hidden rounded border bg-card text-card-foreground">
+        <div className="border-b p-5">
+          <h2 className="text-sm font-bold uppercase">Archive search</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Search by title, then narrow the list by year, category, or type.
+          </p>
+        </div>
+        <div className="max-h-[34rem] overflow-y-auto">
+          <ArchiveSearch data={sampleArchive} />
         </div>
       </section>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-xl border bg-card p-5 text-card-foreground">
-          <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Typography
-          </h2>
-          <div className="mt-4 space-y-3">
-            {TYPE_SCALE.map((entry) => (
-              <p key={entry.label} className={entry.className}>
-                {entry.label}
-              </p>
-            ))}
+      <section className="relative rounded border bg-card p-5 text-card-foreground">
+        <div className="flex items-center gap-4">
+          <div>
+            <h2 className="text-sm font-bold uppercase">About drawer</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Open the three-dot control to inspect the right-side panel.
+            </p>
           </div>
-        </section>
-
-        <section className="rounded-xl border bg-card p-5 text-card-foreground">
-          <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            In use
-          </h2>
-          <Card className="mt-4">
-            <CardHeader>
-              <CardTitle>Create workspace</CardTitle>
-              <CardDescription>
-                Components composed from the tokens above.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="overview-name">Workspace name</Label>
-                <Input id="overview-name" placeholder="Enter a name" />
-              </div>
-              <div className="flex items-center gap-2">
-                <Switch defaultChecked id="overview-notify" />
-                <Label htmlFor="overview-notify">Email notifications</Label>
-                <Badge className="ml-auto">New</Badge>
-              </div>
-            </CardContent>
-            <CardFooter className="gap-2">
-              <Button>Save</Button>
-              <Button variant="outline">Cancel</Button>
-            </CardFooter>
-          </Card>
-        </section>
-      </div>
-
-      <section className="space-y-4 rounded-xl border bg-card p-5 text-card-foreground">
-        <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Components
-        </h2>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button>Primary</Button>
-          <Button variant="secondary">Secondary</Button>
-          <Button variant="outline">Outline</Button>
-          <Button variant="ghost">Ghost</Button>
-          <Badge>Badge</Badge>
-          <Badge variant="secondary">Secondary</Badge>
-          <Badge variant="outline">Outline</Badge>
+          <NavigationDrawer data={{ about: sampleAbout }} inlineTrigger />
         </div>
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-2">
+        <Palette mode="light" roles={['primary', 'secondary', 'accent', 'border']} />
+        <Palette mode="dark" roles={['primary', 'secondary', 'accent', 'border']} />
       </section>
     </div>
   );
@@ -135,107 +158,128 @@ export function OverviewPage() {
 
 export function ColorsPage() {
   return (
-    <div className="space-y-8 rounded-xl border bg-card p-6 text-card-foreground">
-      <section className="space-y-4">
-        <div>
-          <h2 className="font-semibold">Brand colors</h2>
-          <p className="text-sm text-muted-foreground">
-            The core roles used for emphasis, supporting actions, and accents.
-          </p>
-        </div>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-          {CORE_SWATCHES.map((swatch) => (
-            <Swatch key={swatch.name} {...swatch} />
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <div>
-          <h2 className="font-semibold">Semantic and surface colors</h2>
-          <p className="text-sm text-muted-foreground">
-            Roles for text, backgrounds, borders, muted content, and danger.
-          </p>
-        </div>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
-          {SUPPORTING_SWATCHES.map((swatch) => (
-            <Swatch key={swatch.name} {...swatch} />
-          ))}
-        </div>
-      </section>
+    <div className="space-y-5">
+      <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+        The palette is intentionally restrained. Light mode reflects the main
+        archive; dark mode preserves the Discord surfaces and periwinkle action
+        color. Each swatch displays the exact hex value generated from
+        <code className="mx-1">tokens.json</code>.
+      </p>
+      <Palette mode="light" roles={COLOR_ROLES} />
+      <Palette mode="dark" roles={COLOR_ROLES} />
     </div>
   );
 }
 
 export function FontsPage() {
+  const sans = tokens.fontFamily.sans.join(', ');
+
   return (
-    <div className="space-y-8 rounded-xl border bg-card p-6 text-card-foreground">
+    <div className="space-y-6 rounded border bg-card p-5 text-card-foreground">
       <section>
-        <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Font family
-        </h2>
-        <p className="mt-4 text-4xl font-bold">The quick brown fox</p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The token font family is applied across this entire preview.
+        <p className="text-xs font-bold uppercase text-muted-foreground">
+          Primary family
         </p>
+        <p className="mt-3 text-3xl font-bold" style={{ fontFamily: sans }}>
+          Helvetica
+        </p>
+        <code className="mt-2 block text-xs text-muted-foreground">
+          {sans}
+        </code>
       </section>
 
-      <section className="space-y-4 border-t pt-6">
-        <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Type scale
-        </h2>
-        {TYPE_SCALE.map((entry) => (
-          <div key={entry.label} className="grid gap-2 sm:grid-cols-[88px_1fr]">
-            <span className="pt-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {entry.label}
-            </span>
-            <p className={entry.className}>Build products people understand.</p>
-          </div>
-        ))}
+      <section className="space-y-5 border-t pt-5">
+        <p className="text-xs font-bold uppercase text-muted-foreground">
+          Type in context
+        </p>
+        <div className="grid gap-2 sm:grid-cols-[7rem_1fr]">
+          <span className="text-xs uppercase text-muted-foreground">Display</span>
+          <p className="text-4xl font-bold leading-tight tracking-[-0.01em]">
+            New Models
+          </p>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-[7rem_1fr]">
+          <span className="text-xs uppercase text-muted-foreground">
+            Section label
+          </span>
+          <p className="font-bold uppercase">Selected stories</p>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-[7rem_1fr]">
+          <span className="text-xs uppercase text-muted-foreground">Body</span>
+          <p className="text-sm leading-[1.5]">
+            The main interface uses a compact 14px body size with open line
+            spacing and little decorative styling.
+          </p>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-[7rem_1fr]">
+          <span className="text-xs uppercase text-muted-foreground">Caption</span>
+          <p className="text-xs text-muted-foreground">
+            Publication date · category · media type
+          </p>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-[7rem_1fr]">
+          <span className="text-xs uppercase text-muted-foreground">Link</span>
+          <p className="text-sm text-accent underline">Browse the archive</p>
+        </div>
       </section>
     </div>
   );
 }
 
 export function LayoutPage() {
+  const spacingSteps = [
+    { label: '4px', multiplier: 1 },
+    { label: '8px', multiplier: 2 },
+    { label: '12px', multiplier: 3 },
+    { label: '20px', multiplier: 5 },
+    { label: '40px', multiplier: 10 },
+  ];
+  const spacingBase = Number.parseFloat(tokens.spacing);
+
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      <section className="rounded-xl border bg-card p-6 text-card-foreground">
-        <h2 className="font-semibold">Spacing</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          The spacing scale, derived from the base spacing token.
+    <div className="grid gap-5 lg:grid-cols-2">
+      <section className="rounded border bg-card p-5 text-card-foreground">
+        <h2 className="text-sm font-bold uppercase">Spacing</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          The source follows a 4px base step. Twenty-pixel padding and gaps are
+          common for page sections.
         </p>
         <div className="mt-6 space-y-4">
-          {SPACING_SCALE.map((space) => (
-            <div key={space.label} className="flex items-center gap-4">
-              <span className="w-8 text-xs text-muted-foreground">
-                {space.label}
+          {spacingSteps.map((step) => (
+            <div key={step.label} className="flex items-center gap-4">
+              <span className="w-10 text-xs text-muted-foreground">
+                {step.label}
               </span>
-              <div className={`h-3 rounded-full bg-primary ${space.className}`} />
+              <div
+                className="h-3 bg-primary"
+                style={{ width: `${spacingBase * step.multiplier}rem` }}
+              />
             </div>
           ))}
         </div>
       </section>
 
-      <section className="rounded-xl border bg-card p-6 text-card-foreground">
-        <h2 className="font-semibold">Radius</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Corner treatments derive from the base radius token.
+      <section className="rounded border bg-card p-5 text-card-foreground">
+        <h2 className="text-sm font-bold uppercase">Corners and rules</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Most surfaces are square-edged. Small rounded controls and full pills
+          are reserved for compact counters and mode selection.
         </p>
         <div className="mt-6 grid grid-cols-2 gap-4">
-          {[
-            { label: 'Small', className: 'rounded-sm' },
-            { label: 'Medium', className: 'rounded-md' },
-            { label: 'Large', className: 'rounded-lg' },
-            { label: 'Extra large', className: 'rounded-xl' },
-          ].map((radius) => (
-            <div
-              key={radius.label}
-              className={`flex h-24 items-end border bg-muted p-3 ${radius.className}`}
-            >
-              <span className="text-xs font-medium">{radius.label}</span>
-            </div>
-          ))}
+          <div
+            className="flex h-24 items-end border bg-muted p-3"
+            style={{ borderRadius: tokens.radius }}
+          >
+            <span className="text-xs font-medium">
+              Base radius · {tokens.radius}
+            </span>
+          </div>
+          <div className="flex h-24 items-end rounded-full border bg-muted p-3">
+            <span className="text-xs font-medium">Pill · selected controls</span>
+          </div>
+          <div className="col-span-2 border-t pt-3 text-xs text-muted-foreground">
+            Hairline separators use the border token.
+          </div>
         </div>
       </section>
     </div>

@@ -1,48 +1,40 @@
 # Migrating web UI to New Models Design System
 
 Read `artifacts/new-models-design-system/docs/AGENTS.md` and
-`artifacts/new-models-design-system/docs/consuming-web.md` first. Use this guide
-when a web app, including a fresh scaffold, already has local theme or component
-copies.
+`artifacts/new-models-design-system/docs/consuming-web.md` first. This guide is
+for an app that already has local theme or component implementations matching
+the source-backed New Models families.
 
 ## Replace the local theme
 
-Replace the app's Tailwind/theme setup with the package import from the web
-consumption guide.
+Replace the app's duplicate Tailwind/token theme with the package stylesheet:
 
-- Remove the app's own `@import "tailwindcss"`, plugin imports, and generated
-  `:root` / `.dark` token definitions.
-- Keep app-specific CSS that is not a theme or package-provided primitive.
-- Keep Tailwind v3 directives and configure its package component source as
+- Remove duplicate Tailwind imports, plugin imports, and `:root`/`.dark` token
+  definitions after verifying the package stylesheet supplies them.
+- Keep app-specific CSS that is not a theme or one of the component families.
+- Keep Tailwind v3 directives and configure the package component source as
   described in the web consumption guide.
 
-## Rewrite imports
+## Rewrite matching component imports
 
-Rewrite every local import for a module this package provides:
+The current web exports are:
 
-- `@/components/ui/<name>` →
-  `@workspace/new-models-design-system/components/ui/<name>`
-- `@/lib/utils` (`cn`) → `@workspace/new-models-design-system/lib/utils`
-- `@/hooks/use-toast` → `@workspace/new-models-design-system/hooks/use-toast`
+- Editorial content → `@workspace/new-models-design-system/components/ui/editorial-content`
+- Archive search → `@workspace/new-models-design-system/components/ui/archive-search`
+- View selector → `@workspace/new-models-design-system/components/ui/mode-toggle`
+- About drawer → `@workspace/new-models-design-system/components/ui/navigation-drawer`
 
-Judge component ownership by the imported module, not by the file doing the
-import. App-specific components may remain local, but they must import shared
-primitives from this package.
+Do not rewrite unrelated app components to nonexistent generic button, toast,
+or utility exports. Keep app-specific page compositions and service calls local.
 
-## Delete superseded files
+## Remove superseded implementations carefully
 
-- Delete package-provided files from the app's `src/components/ui/`; remove the
-  directory if it becomes empty.
-- Delete local `src/lib/utils.ts` when it only provided `cn`.
-- Delete local `src/hooks/use-toast.ts` after every caller uses the package hook.
-- Remove dependencies used only by the deleted local component library when the
-  design-system package already supplies them transitively.
+Replace or delete only local implementations that are fully covered by one of
+the exports above. Retain app-specific data flows and API routes. Remove
+dependencies only when they are no longer used anywhere else in the app.
 
 ## Verify migration
 
-Grep for `@/components/ui/`, `@/lib/utils`, and `@/hooks/use-toast`. Every
-remaining match must refer to an app-specific module or export the package does
-not provide. Run typecheck and the dev server after deleting local copies.
-
-Migration is complete when no package-provided component, `cn`, toast hook, or
-theme token block remains local.
+Check that matching component callsites import the package, then run the
+consumer's typecheck and dev server. Confirm that the package stylesheet loads
+and that the migrated family retains its source-shaped props and interactions.

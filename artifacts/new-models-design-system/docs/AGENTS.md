@@ -14,10 +14,9 @@ on it and import its theme and components directly.
 - `src/generated/tokens.tsx` — GENERATED hex token object, the package's `.` and
   `./tokens` entry. Mobile (Expo) and other platforms import this.
 - `public/favicon.svg` — GENERATED app icon from `tokens.json` + the title.
-- `src/components/ui/` — the initial shadcn scaffold, exported as
-  `./components/*`. Generated systems keep and theme it; Figma imports prune and
-  restyle it; code imports replace it with the source component library.
-- `src/lib/` (`cn`) and `src/hooks/` — exported as `./lib/*` and `./hooks/*`.
+- `src/components/ui/` — the source-derived New Models component families,
+  exported as `./components/*`. See `docs/source-inventory.md` and the
+  per-family references in `docs/references/`.
 - `src/App.tsx` — the entry point for the living style guide.
 - `src/preview/DesignSystemBrowser.tsx` — the persistent grouped navigation,
   branded header, search, deep links, and active page shell.
@@ -51,17 +50,13 @@ not add `.ts` files here.
 ".":              "./src/generated/tokens.tsx",
 "./tokens":       "./src/generated/tokens.tsx",
 "./styles.css":   "./src/index.css",
-"./components/*": "./src/components/*.tsx",
-"./lib/*":        "./src/lib/*.tsx",
-"./hooks/*":      "./src/hooks/*.tsx"
+"./components/*": "./src/components/*.tsx"
 ```
 
 Components import each other with relative paths internally, so they resolve
 correctly when another package imports them through
 `@workspace/new-models-design-system/components/...`. Never use a `@/` alias inside
-this package. Components added through shadcn may use this package's
-`#components/*`, `#lib/*`, and `#hooks/*` imports from `package.json`; those are
-consumer-safe because they resolve against this package.
+this package.
 
 ## Editing and maintaining the design system
 
@@ -75,10 +70,10 @@ update its story and registry entry in the same change and note meaningful
 additions or customizations in "What's here" above. Register new component pages
 with dynamic imports; do not eagerly import stories into the registry.
 
-Native components live under `src/components/native/`. Match an existing web
-component family's public API wherever React Native supports it, and document
-platform-required differences in "What's here". Native components are not
-imported into the web-only Vite preview.
+The current pilot has no native component exports. If a native library is added
+later, place it under `src/components/native/`, match web-family APIs where
+React Native supports them, and document platform differences in "What's
+here". Native components must stay out of the web-only Vite preview.
 
 Keep `DESIGN_SYSTEM.title` and `DESIGN_SYSTEM.description` accurate. Update
 `NAV_GROUPS` whenever the system gains or loses a foundation, content guideline,
